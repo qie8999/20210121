@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script>
+        //pivot함수 만들기
+        $.fn.pivot = function (options) {
+            //변수선언
+            var $target = $(this); //this는 pivot
+            var $items = $target.children();
+            //div태그로 감싸기
+            var $container = $target.wrap('<div></div>').parent();
+            //wrap은 jquery함수
+            var option = {
+                width: 500,
+                height: 450
+            };
+
+            //옵션을 변경
+            // width:500 hegith:450 ->700,700
+            $.extend(option.options);
+
+            $target.css({
+                width: $items.length * option.width,
+                height: option.height,
+                position: 'absolute'
+            });
+            //피벗하는 코드(슬라이드)
+            $items.css({
+                float: 'left',
+                width: option.width,
+                height: option.height
+            });
+            $container.css({
+                overflow: 'hidden',
+                position: 'relative',
+                width: option.width,
+                height: option.height
+            });
+            //이벤트 연결
+            var originalLeft =0;
+            var oldLeft =0;
+            var nowPosition =0;
+            var isDown =false;
+
+            $target.on('mousedown',function(event)
+            {
+                oldLeft=originalLeft=event.clientX;
+                isDown =true;
+                event.preventDefault();
+            });
+            //움직이는 함수 만들기
+            $target.on('mousemove',function(event)
+            {
+                if(isDown)
+                {
+                    var distance=oldLeft-event.clientX;
+                    oldLeft=event.clientX;
+
+                    //움직입니다
+                    $target.animate({left:'-='+distance},0);
+                    $target.stop(true); //움직이고 나서 멈추기
+                }
+                event.preventDefault();
+            });
+            // 마우스를 뗏을때
+            $target.on('mouseup',function(event)
+            {
+                function movePosition(direction)
+                {
+                    var changePosition = nowPosition +direction;
+                    if( 0 <= changePosition && changePosition <$items.length)
+                    {
+                        nowPosition =changePosition;
+                    }
+                }
+                //요소의 1/4이상 드래그시 피벗한다(움직임 = 피벗하다)
+                //어느쪽으로 드래그했느냐에 따라 움직이는 방향 다름
+                if(originalLeft-event.clientX > option.width/4)
+                {
+                    movePosition(+1);
+                }else if(originalLeft-event.clientX < -option.width/4)
+                {
+                    movePosition(-1);
+                }
+                //이동
+                $target.animate({'left' : -nowPosition*option.width},'fast');
+                isDown=false;
+                event.preventDefault();
+            });
+        };
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#pivot_slider').pivot({
+                width: 700,
+                height: 700
+            });
+
+        });
+    </script>
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>아래 영역 드래그해라</h2>
+    <div id="pivot_slider">
+        <div>
+            <h1>Lorem, ipsum dolor.</h1>
+            <img src="Desert.jpg" alt="" width="300px">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum qui ipsum deserunt amet aliquid ex quia
+                explicabo veniam  Porro iure vero aliquid esse. Nulla tempore debitis expedita temporibus soluta et
+                earum maxime, sequi dolorem rem! Molestias!</p>
+        </div>
+        <div>
+            <h1>Lorem, ipsum dolor.</h1>
+            <img src="Hydrangeas.jpg" alt="" width="300px">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum qui ipsum deserunt amet aliquid ex quia
+                explicabo v illum! Porro iure vero aliquid esse. Nulla tempore debitis expedita temporibus soluta et
+                earum maxime, sequi dolorem rem! Molestias!</p>
+        </div>
+        <div>
+            <h1>Lorem, ipsum dolor.</h1>
+            <img src="Jellyfish.jpg" alt="" width="300px">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum qui ipsum deserunt amet aliquid ex quia
+                explicabo veniam  Porro iure vero aliquid esse. Nulla tempore debitis expedita temporibus soluta et
+                earum maxime, sequi dolorem rem! Molestias!</p>
+        </div>
+        <div>
+            <h1>Lorem, ipsum dolor.</h1>
+            <img src="Koala.jpg" alt="" width="300px">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum qui ipsum deserunt amet aliquid ex quia
+                explicabo veniam  Porro iure vero aliquid esse. Nulla tempore debitis expedita temporibus soluta et
+                earum maxime, sequi dolorem rem! Molestias!</p>
+        </div>
+        <div>
+            <h1>Lorem, ipsum dolor.</h1>
+            <img src="Lighthouse.jpg" alt="" width="300px">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum qui ipsum deserunt amet aliquid ex quia
+                explicabo veniam Porro iure vero aliquid esse. Nulla tempore debitis expedita temporibus soluta et
+                earum maxime, sequi dolorem rem! Molestias!</p>
+        </div>
+    </div>
+</body>
+
+</html>
